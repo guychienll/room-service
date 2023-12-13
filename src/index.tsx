@@ -1,16 +1,32 @@
 import * as React from 'react';
+import { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import styles from '@/base.scss';
 import RoomAllocation from '@/components/RoomAllocation';
+import { MEMBER_VARIANT } from '@/components/RoomAllocation/constants';
 
 const App: React.FC = () => {
+  const guest = 10;
+  const room = 3;
+  const [values, setValues] = useState(() => {
+    const result = [];
+    for (let i = 0; i < room; i++) {
+      result.push({
+        [MEMBER_VARIANT.ADULT]: 1,
+        [MEMBER_VARIANT.CHILD]: 0,
+      });
+    }
+    return result;
+  });
+
   return (
     <div className={styles.wrapper}>
       <RoomAllocation
-        guest={10}
-        room={3}
+        guest={guest}
+        room={room}
+        values={values}
         onChange={(result) => {
-          console.log(result);
+          setValues(result);
         }}
       />
     </div>

@@ -6,8 +6,10 @@ import { isOutOfRange } from '@/utils';
 import { STEP_METHOD } from '@/components/CustomInputNumber/constants';
 import { useLongPress } from '@/hooks/useLongPress';
 import { v4 as uuid } from 'uuid';
+import { AiOutlinePlus, AiOutlineMinus } from 'react-icons/ai';
+import { withErrorBoundary } from '@/components/ErrorBoundary';
 
-type Props = {
+export type CustomInputNumberProps = {
   id?: string;
   min: number;
   max: number;
@@ -28,7 +30,7 @@ type Props = {
   };
 };
 
-const CustomInputNumber: React.FC<Props> = (props) => {
+const CustomInputNumber: React.FC<CustomInputNumberProps> = (props) => {
   const {
     id = uuid(),
     min,
@@ -130,7 +132,7 @@ const CustomInputNumber: React.FC<Props> = (props) => {
         ])}
         {...stepDownLongPressHook}
       >
-        -
+        <AiOutlineMinus />
       </label>
       <input
         id={id}
@@ -158,10 +160,10 @@ const CustomInputNumber: React.FC<Props> = (props) => {
         ])}
         {...stepUpLongPressHook}
       >
-        +
+        <AiOutlinePlus />
       </label>
     </div>
   );
 };
 
-export default CustomInputNumber;
+export default withErrorBoundary(CustomInputNumber);
