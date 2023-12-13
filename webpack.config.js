@@ -5,6 +5,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
 const TerserPlugin = require('terser-webpack-plugin');
 const { merge } = require('webpack-merge');
+const CopyPlugin = require('copy-webpack-plugin');
 
 const mode = process.env.NODE_ENV || 'development';
 const isProduction = mode === 'production';
@@ -73,12 +74,16 @@ const baseConfig = {
     port: 3000,
     open: true,
   },
+
   plugins: [
     new MiniCssExtractPlugin(),
     new HtmlWebpackPlugin({
       template: './src/index.html',
     }),
     new ForkTsCheckerWebpackPlugin(),
+    new CopyPlugin({
+      patterns: [{ from: 'static' }],
+    }),
   ],
 };
 
