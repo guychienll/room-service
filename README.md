@@ -12,7 +12,7 @@
       - [Build the application](#build-the-application)
         - [development build](#development-build)
         - [production build](#production-build)
-    - [Storybook](#storybook)
+  - [Storybook](#storybook)
 
 ## Demo Links
 
@@ -37,7 +37,7 @@ flowchart TD
 
     subgraph webpack
         script --> babel-loader --> .dist/bundle.js
-        stylesheet --> sass-loader --> css-loader --> mini-extract-css-loader --> .dist/main.css
+        stylesheet --> sass-loader --> postcss-loader --> css-loader --> mini-extract-css-loader --> .dist/main.css
     end
 
     .dist/bundle.js --> html
