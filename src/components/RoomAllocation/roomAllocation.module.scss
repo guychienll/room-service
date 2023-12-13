@@ -1,0 +1,22 @@
+.wrapper {
+  max-width: 420px;
+  padding: 16px;
+  margin: 16px;
+  border: 3px dashed #86bedd;
+  & > .header {
+    padding: 8px 0;
+  }
+  & > .info {
+    padding: 16px 12px;
+    background-color: #f1fdff;
+    border: 1px solid #86bedd;
+    border-radius: 4px;
+    color: #444444;
+    margin: 8px 0;
+  }
+  & > .roomAllocator {
+    &:not(:last-child) {
+      border-bottom: 1px solid #e8e8e8;
+    }
+  }
+}

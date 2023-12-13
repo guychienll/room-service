@@ -1,22 +1,17 @@
 import * as React from 'react';
 import ReactDOM from 'react-dom/client';
-import CustomInputNumber from '@/components/CustomInputNumber';
-import { useState } from 'react';
+import styles from '@/base.scss';
+import RoomAllocation from '@/components/RoomAllocation';
 
 const App: React.FC = () => {
-  const [value, setValue] = useState(0);
   return (
-    <div>
-      <CustomInputNumber
-        id="custom-input"
-        max={20}
-        min={0}
-        name="custom-input"
-        onChange={(e) => {
-          setValue(Number.parseInt(e.target.value));
+    <div className={styles.wrapper}>
+      <RoomAllocation
+        guest={10}
+        room={3}
+        onChange={(result) => {
+          console.log(result);
         }}
-        step={2}
-        value={value}
       />
     </div>
   );

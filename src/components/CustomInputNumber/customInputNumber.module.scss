@@ -6,10 +6,11 @@
 
 @mixin box {
   display: flex;
+  align-items: center;
   justify-content: center;
   text-align: center;
   width: 48px;
-  aspect-ratio: 1;
+  height: 48px;
   border-radius: 4px;
 }
 
@@ -26,7 +27,6 @@
 
 .wrapper {
   display: flex;
-  padding: 8px;
 
   & > .button {
     @include box;
@@ -52,10 +52,8 @@
     font-size: 16px;
     border: 1px solid #d4d4d4;
     color: #222222;
-
     margin: 0 8px;
     justify-content: center;
-    text-align: center;
 
     &:disabled {
       @include disabled;

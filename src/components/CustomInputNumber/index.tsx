@@ -1,13 +1,14 @@
 import * as React from 'react';
-import { ChangeEvent, useEffect, useRef, useState } from 'react';
-import styles from '@/components/CustomInputNumber/customInputNumber.scss';
+import { ChangeEvent, useEffect, useRef } from 'react';
+import styles from '@/components/CustomInputNumber/customInputNumber.module.scss';
 import clsx from 'clsx';
 import { isOutOfRange } from '@/utils';
-import { StepMethod } from '@/components/CustomInputNumber/constants';
+import { STEP_METHOD } from '@/components/CustomInputNumber/constants';
 import { useLongPress } from '@/hooks/useLongPress';
+import { v4 as uuid } from 'uuid';
 
 type Props = {
-  id: string;
+  id?: string;
   min: number;
   max: number;
   step: number;
@@ -16,6 +17,11 @@ type Props = {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (e: React.FocusEvent<HTMLInputElement>) => void;
   disabled?: boolean;
+  validator?: (prev: number, next: number) => boolean;
+  stepDisabled?: {
+    [STEP_METHOD.UP]?: boolean;
+    [STEP_METHOD.DOWN]?: boolean;
+  };
   longPressOptions?: {
     threshold: number;
     interval: number;
@@ -24,13 +30,18 @@ type Props = {
 
 const CustomInputNumber: React.FC<Props> = (props) => {
   const {
-    id,
+    id = uuid(),
     min,
     max,
     step,
     name,
     value,
     disabled = false,
+    validator = () => true,
+    stepDisabled = {
+      [STEP_METHOD.UP]: false,
+      [STEP_METHOD.DOWN]: false,
+    },
     longPressOptions = {
       threshold: 1000,
       interval: 200,
@@ -38,7 +49,6 @@ const CustomInputNumber: React.FC<Props> = (props) => {
     onChange,
     onBlur,
   } = props;
-  const [count, setCount] = useState<number>(value);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const minusRef = useRef<HTMLLabelElement | null>(null);
   const plusRef = useRef<HTMLLabelElement | null>(null);
@@ -49,23 +59,40 @@ const CustomInputNumber: React.FC<Props> = (props) => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { value: _value } = e.target;
+    const isStep =
+      (e.nativeEvent as CustomEvent<{ isStep: boolean }>).detail.isStep ||
+      false;
     const nextCount = _value ? Number.parseInt(_value) : min;
-    if (isOutOfRange(nextCount, { max, min })) {
+
+    if (!isStep) {
+      const isValid = validator(value, nextCount);
+      if (!isValid) {
+        return;
+      }
+    }
+
+    if (isOutOfRange(nextCount, { max, min }) || disabled) {
       return;
     }
-    setCount(nextCount);
-    onChange && onChange(e);
+
+    onChange(e);
   };
 
-  const handleStep = (method: StepMethod) => () => {
+  const handleStep = (method: STEP_METHOD) => () => {
+    if (stepDisabled[method]) {
+      return;
+    }
     if (inputRef.current) {
-      const nextCount = method === StepMethod.Up ? count + step : count - step;
+      const nextCount = method === STEP_METHOD.UP ? value + step : value - step;
 
       const InputEvent = Object.getOwnPropertyDescriptor(
         HTMLInputElement.prototype,
         'value',
       )?.set;
-      const event = new Event('input', { bubbles: true });
+      const event = new CustomEvent('input', {
+        bubbles: true,
+        detail: { isStep: true },
+      });
       InputEvent?.call(inputRef.current, nextCount);
       inputRef.current.dispatchEvent(event);
     }
@@ -74,16 +101,16 @@ const CustomInputNumber: React.FC<Props> = (props) => {
   useEffect(() => {
     if (isStepDownLongPressing) {
       setTimeout(() => {
-        handleStep(StepMethod.Down)();
+        handleStep(STEP_METHOD.DOWN)();
       }, longPressOptions.interval);
     }
 
     if (isStepUpLongPressing) {
       setTimeout(() => {
-        handleStep(StepMethod.Up)();
+        handleStep(STEP_METHOD.UP)();
       }, longPressOptions.interval);
     }
-  }, [isStepDownLongPressing, isStepUpLongPressing, count]);
+  }, [isStepDownLongPressing, isStepUpLongPressing, value]);
 
   if (min >= max) {
     throw new Error('min must be less than max');
@@ -94,8 +121,13 @@ const CustomInputNumber: React.FC<Props> = (props) => {
       <label
         htmlFor={id}
         ref={minusRef}
-        onClick={handleStep(StepMethod.Down)}
-        className={clsx([styles.button, disabled && styles.disabled])}
+        onClick={handleStep(STEP_METHOD.DOWN)}
+        className={clsx([
+          styles.button,
+          disabled && styles.disabled,
+          stepDisabled[STEP_METHOD.DOWN] && styles.disabled,
+          value <= min && styles.disabled,
+        ])}
         {...stepDownLongPressHook}
       >
         -
@@ -106,10 +138,8 @@ const CustomInputNumber: React.FC<Props> = (props) => {
         name={name}
         type="number"
         step={step}
-        value={count}
-        onChange={(e) => {
-          handleChange(e);
-        }}
+        value={value}
+        onChange={handleChange}
         onBlur={(e) => {
           onBlur && onBlur(e);
         }}
@@ -119,8 +149,13 @@ const CustomInputNumber: React.FC<Props> = (props) => {
       <label
         htmlFor={id}
         ref={plusRef}
-        onClick={handleStep(StepMethod.Up)}
-        className={clsx([styles.button, disabled && styles.disabled])}
+        onClick={handleStep(STEP_METHOD.UP)}
+        className={clsx([
+          styles.button,
+          disabled && styles.disabled,
+          stepDisabled[STEP_METHOD.UP] && styles.disabled,
+          value >= max && styles.disabled,
+        ])}
         {...stepUpLongPressHook}
       >
         +

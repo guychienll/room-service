@@ -1,4 +1,4 @@
-export enum StepMethod {
-  Up = 'up',
-  Down = 'down',
+export enum STEP_METHOD {
+  UP = 'up',
+  DOWN = 'down',
 }
