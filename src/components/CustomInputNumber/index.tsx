@@ -52,8 +52,6 @@ const CustomInputNumber: React.FC<CustomInputNumberProps> = (props) => {
     onBlur,
   } = props;
   const inputRef = useRef<HTMLInputElement | null>(null);
-  const minusRef = useRef<HTMLLabelElement | null>(null);
-  const plusRef = useRef<HTMLLabelElement | null>(null);
   const { isLongPressing: isStepDownLongPressing, ...stepDownLongPressHook } =
     useLongPress(longPressOptions.threshold);
   const { isLongPressing: isStepUpLongPressing, ...stepUpLongPressHook } =
@@ -122,7 +120,6 @@ const CustomInputNumber: React.FC<CustomInputNumberProps> = (props) => {
     <div className={clsx([styles.wrapper])}>
       <label
         htmlFor={id}
-        ref={minusRef}
         onClick={handleStep(STEP_METHOD.DOWN)}
         className={clsx([
           styles.button,
@@ -150,7 +147,6 @@ const CustomInputNumber: React.FC<CustomInputNumberProps> = (props) => {
       />
       <label
         htmlFor={id}
-        ref={plusRef}
         onClick={handleStep(STEP_METHOD.UP)}
         className={clsx([
           styles.button,
